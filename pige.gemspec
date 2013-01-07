@@ -27,5 +27,4 @@ Gem::Specification.new do |gem|
   gem.add_development_dependency "guard-bundler"
   gem.add_development_dependency "flog"
   gem.add_development_dependency "flay"
-  gem.add_development_dependency "roodi"
 end
