@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Record::Set do
+describe Pige::Record::Set do
 
   describe "#file" do
     
@@ -30,19 +30,19 @@ describe Record::Set do
   describe "#parse_id" do
     
     it "should read hexadecimal epoch times" do
-      Record::Set.parse_id("4f689210-4f68a020").should == [ time("03/20/2012 14:20 UTC"), time("03/20/2012 15:20 UTC") ]
+      Pige::Record::Set.parse_id("4f689210-4f68a020").should == [ time("03/20/2012 14:20 UTC"), time("03/20/2012 15:20 UTC") ]
     end
 
     it "should return nil if id is invalid" do
-      Record::Set.parse_id("dummy").should be_nil
+      Pige::Record::Set.parse_id("dummy").should be_nil
     end
 
     it "should return nil if id is nil" do
-      Record::Set.parse_id(nil).should be_nil
+      Pige::Record::Set.parse_id(nil).should be_nil
     end
 
     it "should return nil if id is blank" do
-      Record::Set.parse_id("").should be_nil
+      Pige::Record::Set.parse_id("").should be_nil
     end
 
   end

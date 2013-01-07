@@ -56,11 +56,11 @@ class TestDirectory
   end
 
   def index
-    @index ||= Record::Index.new(directory)
+    @index ||= Pige::Record::Index.new(directory)
   end
 
   def index_directory(name)
-    Record::Directory.new index, name
+    Pige::Record::Directory.new index, name
   end
 
   def expand_path(name)

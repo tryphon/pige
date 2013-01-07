@@ -29,7 +29,7 @@ class Pige::Record::Index
     filename = Dir.glob("#{directory}/#{basename_at(time)}.{wav,ogg}").first
     return nil unless filename
 
-    record = Record.new(File.expand_path(filename))
+    record = Pige::Record.new(File.expand_path(filename))
     return nil if record.empty?
     
     record
@@ -57,7 +57,7 @@ class Pige::Record::Index
     record = last_record(before)
     return nil unless record
 
-    Record::Set.new.tap do |set|
+    Pige::Record::Set.new.tap do |set|
       while record
         set << record
         record = previous(record)
@@ -77,7 +77,7 @@ class Pige::Record::Index
         if set.duration and set.duration > min_duration
           sets.unshift set
         else
-          Pige.logger.info "Ignore Record::Set #{set.inspect}"
+          Pige.logger.info "Ignore Pige::Record::Set #{set.inspect}"
         end
         set = last_set(set.begin)
       end
@@ -87,13 +87,13 @@ class Pige::Record::Index
   def set(id_or_begin_date, end_date = nil)
     begin_date, end_date =
       if end_date.nil?
-        Record::Set.parse_id(id_or_begin_date)
+        Pige::Record::Set.parse_id(id_or_begin_date)
       else
         [id_or_begin_date, end_date]
       end
 
       record = record_at(begin_date)
-      record_set = Record::Set.new.tap do |set|
+      record_set = Pige::Record::Set.new.tap do |set|
         while record and record.begin <= end_date
           set << record
           record = next_record(record)

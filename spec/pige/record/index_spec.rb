@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Record::Index do
+describe Pige::Record::Index do
 
   describe "#set" do
 
@@ -12,7 +12,7 @@ describe Record::Index do
       let(:id) { "4f689210-4f68a020" }
       
       it "should parse Set id" do
-        Record::Set.should_receive(:parse_id).and_return([begin_date, end_date])
+        Pige::Record::Set.should_receive(:parse_id).and_return([begin_date, end_date])
         subject.set(id)
       end
 
@@ -92,7 +92,7 @@ describe Record::Index do
 
     it "should ignore files suffixed with -<n>.wav/ogg" do
       # Ignore files like :
-      # <Record:0xb655ebf8 @filename="/srv/pige/records/2012/04-Apr/20-Fri/08h55-1.wav">
+      # <Pige::Record:0xb655ebf8 @filename="/srv/pige/records/2012/04-Apr/20-Fri/08h55-1.wav">
       in_a_directory do |directory|
         directory.with "2012/03-Mar/06-Tue/19h10-1.wav"
         directory.with "2012/03-Mar/06-Tue/19h10-1.ogg"
@@ -104,7 +104,7 @@ describe Record::Index do
 
     it "should accept partial files (duration < 5min)" do
       # Ignore files like :
-      # <Record:0xb655ebf8 @filename="/srv/pige/records/2012/04-Apr/20-Fri/08h55-1.wav">
+      # <Pige::Record:0xb655ebf8 @filename="/srv/pige/records/2012/04-Apr/20-Fri/08h55-1.wav">
       in_a_directory do |directory|
         directory.with "2012/03-Mar/06-Tue/19h05.wav", :duration => 2.minutes
 

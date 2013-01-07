@@ -1,9 +1,9 @@
 require 'spec_helper'
 
-describe Record::Directory do
+describe Pige::Record::Directory do
 
-  let(:index) { Record::Index.new }
-  subject { Record::Directory.new index, "2012/04-Apr/19-Thu" }
+  let(:index) { Pige::Record::Index.new }
+  subject { Pige::Record::Directory.new index, "2012/04-Apr/19-Thu" }
 
   describe "#path" do
     it "should join index.directory and name" do

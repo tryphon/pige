@@ -1,8 +1,8 @@
 require 'spec_helper'
 
-describe Record do
+describe Pige::Record do
 
-  subject { Record.new(tune_file(300)) }
+  subject { Pige::Record.new(tune_file(300)) }
 
   describe "#filename_time_parts" do
 
@@ -60,7 +60,7 @@ describe Record do
   describe "#file_duration" do
     
     it "should return audio duration read by TagFile" do
-      Record.new(tune_file(300)).should have_duration_of(300.seconds)
+      Pige::Record.new(tune_file(300)).should have_duration_of(300.seconds)
     end
 
     it "should be nil when file isn't found" do

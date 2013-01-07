@@ -76,10 +76,10 @@ class Pige::Record::Directory
 
   def records
     all_records = unmodified_record_files.collect do |entry|
-      Record.new(filename(entry))
+      Pige::Record.new(filename(entry))
     end.delete_if(&:empty?).sort_by(&:begin)
 
-    Record.uniq all_records
+    Pige::Record.uniq all_records
   end
 
   def last_record(before = nil)
