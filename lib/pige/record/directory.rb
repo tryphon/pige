@@ -61,23 +61,18 @@ class Pige::Record::Directory
 
   def record_files
     files.select do |entry|
-      entry.match /\.(wav|ogg)$/ and
-        not entry.match /-[0-9]+\.(wav|ogg)$/
+      entry.match /\.(wav|ogg)$/
     end
   end
 
-  def unmodified_record_files(max_mtime = Time.now - 30)
-    record_files.delete_if do |entry|
-      (File.mtime(filename(entry)) > max_mtime).tap do |pending_file| 
-        Pige.logger.debug "Ignore modified #{filename(entry)}" if pending_file
-      end
-    end
+  def record(entry)
+    Pige::Record.new filename(entry), :base_directory => index.directory
   end
 
   def records
-    all_records = unmodified_record_files.collect do |entry|
-      Pige::Record.new(filename(entry))
-    end.delete_if(&:empty?).sort_by(&:begin)
+    all_records = record_files.collect do |entry|
+      record(entry)
+    end.select(&:valid?).sort_by(&:begin)
 
     Pige::Record.uniq all_records
   end

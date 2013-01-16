@@ -102,9 +102,18 @@ describe Pige::Record::Index do
       end
     end
 
-    it "should accept partial files (duration < 5min)" do
+    it "should ignore files with seconds" do
       # Ignore files like :
-      # <Pige::Record:0xb655ebf8 @filename="/srv/pige/records/2012/04-Apr/20-Fri/08h55-1.wav">
+      # <Pige::Record:0xb655ebf8 @filename="/srv/pige/records/2012/04-Apr/20-Fri/08h55m32.wav">
+      in_a_directory do |directory|
+        directory.with "2012/03-Mar/06-Tue/19h10m32.wav"
+        directory.with "2012/03-Mar/06-Tue/19h05.wav"
+
+        directory.index.last_record.filename.should == directory.expand_path("2012/03-Mar/06-Tue/19h05.wav")
+      end
+    end
+
+    it "should accept partial files (duration < 5min)" do
       in_a_directory do |directory|
         directory.with "2012/03-Mar/06-Tue/19h05.wav", :duration => 2.minutes
 
@@ -163,6 +172,20 @@ describe Pige::Record::Index do
         directory.with "2012/03-Mar/06-Tue/18h05.wav"
 
         directory.with "2012/03-Mar/06-Tue/18h35.wav", :size => 0
+        
+        directory.with "2012/03-Mar/06-Tue/19h00.wav"
+        directory.with "2012/03-Mar/06-Tue/19h05.wav"
+          
+        directory.index.sets.map(&:id).should == [ "4f5650a0-4f5651cc", "4f565eb0-4f565fdc" ]
+      end
+    end
+
+    it "should ignore records with seconds" do
+      in_a_directory do |directory|
+        directory.with "2012/03-Mar/06-Tue/18h00.wav"
+        directory.with "2012/03-Mar/06-Tue/18h05.wav"
+
+        directory.with "2012/03-Mar/06-Tue/18h35m32.wav"
         
         directory.with "2012/03-Mar/06-Tue/19h00.wav"
         directory.with "2012/03-Mar/06-Tue/19h05.wav"

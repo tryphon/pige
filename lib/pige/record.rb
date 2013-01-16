@@ -1,9 +1,10 @@
 class Pige::Record
 
-  attr_accessor :begin, :duration, :filename
+  attr_accessor :begin, :duration, :filename, :base_directory
 
-  def initialize(filename = nil)
-    @filename = filename
+  def initialize(filename = nil, options = {})
+    self.filename = filename
+    self.base_directory = options[:base_directory]
   end
 
   def begin
@@ -14,8 +15,30 @@ class Pige::Record
     time.nil? or self.end < time or self.begin < time
   end
 
+  def relative_filename
+    if base_directory and filename =~ %r{^#{base_directory}/(.*)$}
+      $1
+    end
+  end
+
+  def valid?
+    return false if filename_time_parts.size != 5
+    return false if opened?
+    return false if empty?
+
+    true
+  end
+
+  def opened?
+    modified_since < 30.seconds
+  end
+
+  def modified_since
+    Time.now - File.mtime(filename) 
+  end
+
   def filename_time_parts
-    filename.scan(/\d+/).last(5)
+    (relative_filename ? relative_filename : filename).scan(/\d+/)
   end
 
   def file_begin

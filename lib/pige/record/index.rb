@@ -29,7 +29,7 @@ class Pige::Record::Index
     filename = Dir.glob("#{directory}/#{basename_at(time)}.{wav,ogg}").first
     return nil unless filename
 
-    record = Pige::Record.new(File.expand_path(filename))
+    record = Pige::Record.new(filename, :base_directory => directory)
     return nil if record.empty?
     
     record
@@ -42,7 +42,7 @@ class Pige::Record::Index
   end
 
   def complete_record?(record)
-    return false unless record and record.duration
+    return false unless record and record.valid?
 
     duration_delta = record_duration - record.duration
     # record can make 298s or 320s

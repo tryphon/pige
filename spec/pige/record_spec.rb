@@ -4,13 +4,38 @@ describe Pige::Record do
 
   subject { Pige::Record.new(tune_file(300)) }
 
+  describe "#relative_filename" do
+    
+    it "should return nil if Record has no base_directory" do
+      Pige::Record.new("dummy").relative_filename.should be_nil
+    end
+
+    it "should return dummy for /path/to/dummy with /path/to base_directory" do
+      Pige::Record.new("/path/to/dummy", :base_directory => "/path/to").relative_filename.should == "dummy"
+    end
+
+  end
+
   describe "#filename_time_parts" do
 
-    let(:numbers) { Array.new(10) { |n| n.to_s } }
-    
-    it "should scan 5 last numbers in filename" do
-      subject.filename = numbers.join("-")
-      subject.filename_time_parts.should == numbers.last(5)
+    context "when a relative_filename is available" do
+      
+      it "should use numbers in relative_filename" do
+        subject.stub :relative_filename => "dummy/2012/03/06/16:00:30"
+        subject.filename_time_parts.should == %w{2012 03 06 16 00 30}
+      end
+                                                
+    end
+
+    context "without relative_filename" do
+
+      let(:numbers) { Array.new(10) { |n| n.to_s } }
+
+      it "should use numbers in filename" do
+        subject.filename = numbers.join("-")
+        subject.filename_time_parts.should == numbers
+      end
+
     end
 
   end
@@ -25,6 +50,12 @@ describe Pige::Record do
     it "should create UTC time from filename_time_parts" do
       subject.stub :filename_time_parts => %w{2012 03 06 16 00}
       subject.file_begin.should == time("03/06/2012 16:00 UTC")      
+    end
+
+    it "should support '/path/1/to/2013/01-Jan/15-Tue/17h11m36.ogg'" do
+      subject.base_directory = '/path/1/to'
+      subject.filename = '/path/1/to/2013/01-Jan/15-Tue/17h11m36.ogg'
+      subject.file_begin.should == time("01/15/2013 17:11:36 UTC")
     end
 
   end
