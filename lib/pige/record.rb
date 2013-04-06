@@ -21,16 +21,18 @@ class Pige::Record
     end
   end
 
-  def valid?
+  def valid?(options = {})
+    options = { :min_age => 30 }.merge(options)
+
     return false if filename_time_parts.size != 5
-    return false if opened?
+    return false if open?(options[:min_age])
     return false if empty?
 
     true
   end
 
-  def opened?
-    modified_since < 30.seconds
+  def open?(min_age = 30.seconds)
+    modified_since < min_age
   end
 
   def modified_since

@@ -139,5 +139,71 @@ describe Pige::Record do
 
   end
 
+  describe "#modified_since" do
+    
+    it "should return seconds since last file modification" do
+      FileUtils.touch subject.filename, :mtime => (Time.now - 30)
+      subject.modified_since.should be_within(0.001).of(30)
+    end
+
+  end
+
+  describe "#opened?" do
+    
+    it "should return true if modified_since is lower than specified min_age" do
+      subject.stub :modified_since => 20.seconds
+      subject.should be_open(30.seconds)
+    end
+
+    context "when no min_age is specified" do
+                                             
+      it "should return true if modified_since is lower 30 seconds" do
+        subject.stub :modified_since => 29.seconds
+        subject.should be_open
+      end
+      
+    end
+
+  end
+
+  describe "valid?" do
+
+    before do
+      subject.stub :filename_time_parts => %w{2012 03 06 16 00}
+    end
+
+    it "should not be valid if empty" do
+      subject.stub :empty? => true
+      subject.should_not be_valid
+    end
+
+    it "should not be valid if open" do
+      subject.stub :open? => true
+      subject.should_not be_valid
+    end
+
+    it "should use option :min_age to invoke open?" do
+      subject.should_receive(:open?).with(0).and_return(true)
+      subject.valid? :min_age => 0
+    end
+
+    it "should not be valid if filename_time_parts have more than 5 parts" do
+      subject.stub :filename_time_parts => %w{2012 03 06 16 00 36}
+      subject.should_not be_valid
+    end
+
+    context "when not empty, open and filename_time_parts have 5 parts" do
+
+      before do
+        subject.stub :empty? => false
+        subject.stub :open? => false
+      end
+
+      it { should be_valid }
+
+    end
+
+  end
+
 end
 
