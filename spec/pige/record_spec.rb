@@ -143,7 +143,7 @@ describe Pige::Record do
     
     it "should return seconds since last file modification" do
       FileUtils.touch subject.filename, :mtime => (Time.now - 30)
-      subject.modified_since.should be_within(0.001).of(30)
+      subject.modified_since.should be_within(1).of(30)
     end
 
   end
