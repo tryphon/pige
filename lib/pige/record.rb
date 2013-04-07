@@ -96,5 +96,9 @@ class Pige::Record
     records & high_quality_records.values
   end
 
+  def self.human_name
+    I18n.translate :record, :scope => [:activerecord, :models]
+  end
+
 end
 
