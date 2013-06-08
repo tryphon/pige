@@ -65,4 +65,8 @@ class Pige::Record::Set
     end
   end
 
+  def self.human_name
+    I18n.translate :record_set, :scope => [:activerecord, :models]
+  end
+
 end
