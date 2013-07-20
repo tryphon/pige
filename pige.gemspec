@@ -17,8 +17,9 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
-  gem.add_runtime_dependency "taglib-ruby"
-  gem.add_runtime_dependency "activesupport"
+  # TagLib 0.5.0 requires tagc0 1.7
+  gem.add_runtime_dependency "taglib-ruby", "~> 0.4.0"
+  gem.add_runtime_dependency "activesupport", "< 4"
 
   gem.add_development_dependency "rspec"
   gem.add_development_dependency "rake"
