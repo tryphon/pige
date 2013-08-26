@@ -31,7 +31,7 @@ class Pige::Record::Index
 
     record = Pige::Record.new(filename, :base_directory => directory)
     return nil if record.empty?
-    
+
     record
   end
 
@@ -68,7 +68,7 @@ class Pige::Record::Index
   def sets(options = {})
     count = options[:count]
     min_duration = (options[:min_duration] or 0)
-    
+
     Pige.logger.info "Search sets with count=#{count} and min_duration=#{min_duration}"
 
     [].tap do |sets|
@@ -92,20 +92,20 @@ class Pige::Record::Index
         [id_or_begin_date, end_date]
       end
 
-      record = record_at(begin_date)
-      record_set = Pige::Record::Set.new.tap do |set|
-        while record and record.begin <= end_date
-          set << record
-          record = next_record(record)
-        end
+    record = record_at(begin_date)
+    record_set = Pige::Record::Set.new.tap do |set|
+      while record and record.begin <= end_date
+        set << record
+        record = next_record(record)
       end
-      record_set unless record_set.empty?
     end
-
-    def root_directory
-      Pige::Record::Directory.new self, ""
-    end
-
-    delegate :last_record, :to => :root_directory
-
+    record_set unless record_set.empty?
   end
+
+  def root_directory
+    Pige::Record::Directory.new self, ""
+  end
+
+  delegate :last_record, :to => :root_directory
+
+end
