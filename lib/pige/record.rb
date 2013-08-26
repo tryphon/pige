@@ -3,6 +3,7 @@ class Pige::Record
   attr_accessor :begin, :duration, :filename, :base_directory
 
   def initialize(filename = nil, options = {})
+    # Pige.logger.debug "Open record #{filename}"
     self.filename = filename
     self.base_directory = options[:base_directory]
   end
@@ -36,7 +37,7 @@ class Pige::Record
   end
 
   def modified_since
-    Time.now - File.mtime(filename) 
+    Time.now - File.mtime(filename)
   end
 
   def filename_time_parts
@@ -55,14 +56,29 @@ class Pige::Record
     duration.nil? or duration.zero?
   end
 
-  def file_duration
-    return nil if filename.blank?
+  def quickwav_file_duration
+    sample_count = [File.size(filename) - 44, 0].max
+    sample_count / 44100 / 4.0
+  end
+
+  def taglib_file_duration
     TagLib::FileRef.open(filename) do |file|
       file.audio_properties.length
     end
   rescue Exception => e
     Pige.logger.error "Can't read file duration for #{filename} (#{e.inspect})"
     nil
+  end
+
+  def file_duration
+    return nil if filename.blank?
+
+    @file_duration ||=
+      if file_extension == "wav"
+        quickwav_file_duration
+      else
+        taglib_file_duration
+      end
   end
 
   def time_range
@@ -73,11 +89,15 @@ class Pige::Record
     @end ||= self.begin + duration if self.begin and duration
   end
 
+  def file_extension
+    @file_extension ||= File.extname(filename).downcase[1..-1]
+  end
+
   def quality
-    case File.extname(filename).downcase
-    when ".wav" 
+    case file_extension
+    when "wav"
       1
-    when ".ogg"
+    when "ogg"
       0.8
     end
   end
@@ -101,4 +121,3 @@ class Pige::Record
   end
 
 end
-

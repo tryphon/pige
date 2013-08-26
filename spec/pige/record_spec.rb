@@ -5,7 +5,7 @@ describe Pige::Record do
   subject { Pige::Record.new(tune_file(300)) }
 
   describe "#relative_filename" do
-    
+
     it "should return nil if Record has no base_directory" do
       Pige::Record.new("dummy").relative_filename.should be_nil
     end
@@ -19,12 +19,12 @@ describe Pige::Record do
   describe "#filename_time_parts" do
 
     context "when a relative_filename is available" do
-      
+
       it "should use numbers in relative_filename" do
         subject.stub :relative_filename => "dummy/2012/03/06/16:00:30"
         subject.filename_time_parts.should == %w{2012 03 06 16 00 30}
       end
-                                                
+
     end
 
     context "without relative_filename" do
@@ -46,10 +46,10 @@ describe Pige::Record do
       subject.stub :filename_time_parts => []
       subject.file_begin.should be_nil
     end
-    
+
     it "should create UTC time from filename_time_parts" do
       subject.stub :filename_time_parts => %w{2012 03 06 16 00}
-      subject.file_begin.should == time("03/06/2012 16:00 UTC")      
+      subject.file_begin.should == time("03/06/2012 16:00 UTC")
     end
 
     it "should support '/path/1/to/2013/01-Jan/15-Tue/17h11m36.ogg'" do
@@ -61,7 +61,7 @@ describe Pige::Record do
   end
 
   describe "#begin" do
-    
+
     it "should use file_begin by default" do
       subject.stub :file_begin => Time.now
       subject.begin.should == subject.file_begin
@@ -89,7 +89,7 @@ describe Pige::Record do
   end
 
   describe "#file_duration" do
-    
+
     it "should return audio duration read by TagFile" do
       Pige::Record.new(tune_file(300)).should have_duration_of(300.seconds)
     end
@@ -104,18 +104,63 @@ describe Pige::Record do
       subject.file_duration.should be_nil
     end
 
+  end
+
+  describe "#quickwav_file_duration" do
+
+    it "should use File size and 44100 sample rate" do
+      subject.quickwav_file_duration.should == 300
+    end
+
+  end
+
+  describe "#taglib_file_duration" do
+
     it "should TagLib::FileRef to known file duration" do
       taglib_file = mock(TagLib::FileRef).tap do |file|
         file.stub_chain(:audio_properties, :length).and_return(10)
       end
-      
+
       TagLib::FileRef.should_receive(:open).with(subject.filename).and_yield(taglib_file)
-      subject.file_duration.should == 10
+      subject.taglib_file_duration.should == 10
     end
 
     it "should be nil when TagLib::FileRef fails" do
       TagLib::FileRef.stub!(:open).and_raise("error")
-      subject.file_duration.should be_nil
+      subject.taglib_file_duration.should be_nil
+    end
+
+  end
+
+  describe "#file_extension" do
+
+    it "should be 'wav' when filename is 'dummy.wav'" do
+      subject.filename = "dummy.wav"
+      subject.file_extension.should == "wav"
+    end
+
+    it "should be 'ogg' when filename is 'dummy.ogg'" do
+      subject.filename = "dummy.ogg"
+      subject.file_extension.should == "ogg"
+    end
+
+    it "should be nil when filename is 'dummy'" do
+      subject.filename = "dummy"
+      subject.file_extension.should be_nil
+    end
+
+  end
+
+  describe "#quality" do
+
+    it "should be 1 when file_extension is 'wav'" do
+      subject.stub :file_extension => 'wav'
+      subject.quality.should == 1
+    end
+
+    it "should be 0.8 when file_extension is 'ogg'" do
+      subject.stub :file_extension => 'ogg'
+      subject.quality.should == 0.8
     end
 
   end
@@ -123,7 +168,7 @@ describe Pige::Record do
   describe "end" do
 
     let(:begin_date) { Time.now }
-    
+
     it "should be computated from begin and duration when not defined" do
       subject.stub :begin => begin_date, :duration => 300
       subject.end.should == subject.begin + subject.duration
@@ -132,7 +177,7 @@ describe Pige::Record do
   end
 
   describe "#time_range" do
-    
+
     it "should return a range with Record#begin and #end" do
       subject.time_range.should == (subject.begin..subject.end)
     end
@@ -140,7 +185,7 @@ describe Pige::Record do
   end
 
   describe "#modified_since" do
-    
+
     it "should return seconds since last file modification" do
       FileUtils.touch subject.filename, :mtime => (Time.now - 30)
       subject.modified_since.should be_within(1).of(30)
@@ -149,19 +194,19 @@ describe Pige::Record do
   end
 
   describe "#opened?" do
-    
+
     it "should return true if modified_since is lower than specified min_age" do
       subject.stub :modified_since => 20.seconds
       subject.should be_open(30.seconds)
     end
 
     context "when no min_age is specified" do
-                                             
+
       it "should return true if modified_since is lower 30 seconds" do
         subject.stub :modified_since => 29.seconds
         subject.should be_open
       end
-      
+
     end
 
   end
@@ -206,4 +251,3 @@ describe Pige::Record do
   end
 
 end
-
