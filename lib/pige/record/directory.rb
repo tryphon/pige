@@ -78,8 +78,10 @@ class Pige::Record::Directory
   end
 
   def last_record(before = nil)
-    unless records.empty?
-      records.before(before).first
+    current_records = records
+
+    unless current_records.empty?
+      current_records.before(before).first
     else
       self.class.last_record_in(directories, before)
     end
