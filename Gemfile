@@ -9,6 +9,8 @@ else
   gem "rcov"
 end
 
+gem "ruby-prof"
+
 if RUBY_PLATFORM =~ /linux/
   gem 'rb-inotify', '~> 0.8.8'
   gem 'libnotify'

@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+
+# Usage:
+#
+# $ sshfs stagebox.local:/srv/pige/records /mnt/tmp/
+# $ bundle exec ./script/perf-index-sets /mnt/tmp/
+
+require 'rubygems'
+require 'pige'
+require 'ruby-prof'
+
+index = Pige::Record::Index.new ARGV.first
+
+RubyProf.start
+index.sets
+result = RubyProf.stop
+
+printer = RubyProf::GraphPrinter.new(result)
+
+output_file = "log/perf-index-sets.prof"
+File.open(output_file, "w") do |f|
+  printer.print f
+end
+
+puts "Report saved into #{output_file}"
