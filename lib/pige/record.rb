@@ -63,7 +63,7 @@ class Pige::Record
 
   def taglib_file_duration
     TagLib::FileRef.open(filename) do |file|
-      file.audio_properties.length
+      file.audio_properties.length unless file.null?
     end
   rescue Exception => e
     Pige.logger.error "Can't read file duration for #{filename} (#{e.inspect})"
